@@ -1,0 +1,83 @@
+name: Bump Version on Branch Creation
+
+on:
+  create:
+    branches:
+      - 'release/*'
+      - 'hotfix/*'
+
+jobs:
+  bump-version:
+    if: startsWith(github.ref, 'refs/heads/hotfix/') || startsWith(github.ref, 'refs/heads/release/') && github.event_name != 'pull_request'
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+
+      - name: Get branch names.
+        id: branch-names
+        uses: tj-actions/branch-names@v8
+
+      - name: Extract Version and Version Code
+        uses: ./.github/actions/extract-version
+        id: version-extract
+        with:
+          branch_name: ${{ steps.branch-names.outputs.current_branch }}
+
+      - name: Update library version
+        uses: ./.github/actions/update-versions
+        with:
+          version_name: ${{ steps.version-extract.outputs.version_name }}
+          gradle_properties_location: "./gradle.properties"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      - name: Publish to MavenCentral
+        run: ./gradlew publishToMavenCentral --no-configuration-cache
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
+
+      - name: Update README.md in place
+        shell: bash
+        run: |
+          VERSION="${{ steps.version-extract.outputs.version_name }}"
+          sed -i '' -E "s|implementation\(\"com\.kkalisz\.datamap:runtime:[^\"]*\"\)|implementation(\"com.kkalisz.datamap:runtime:${VERSION}\")|g" README.md
+          sed -i '' -E "s|ksp\(\"com\.kkalisz\.datamap:processor:[^\"]*\"\)|ksp(\"com.kkalisz.datamap:processor:${VERSION}\")|g" README.md
+      - name: Commit version bump
+
+        run: |
+          git config user.name "CI Bot"
+          git config user.email "ci-bot@kkalisz.com"
+          git add gradle.properties
+          git add README.md
+
+          git commit -m "Bump version to ${{ steps.version-extract.outputs.version_name }} for branch ${{ steps.branch-names.outputs.current_branch }} [skip ci]"
+          git push origin HEAD
+
+      - name: Create a Release
+        uses: elgohr/Github-Release-Action@v5
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: v${{ steps.version-extract.outputs.version_name }}
+          title: ${{ steps.version-extract.outputs.version_name }}
+
+      - name: Commit version bump
+        uses: peter-evans/create-pull-request@v3.10.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Bump version to ${{ steps.version-extract.outputs.version_name }} for branch ${{ steps.branch-names.outputs.current_branch }} [skip ci]"
+          title: "Bump version to ${{ steps.version-extract.outputs.version_name }}"
+          body: Auto-created Pull Request
+          branch: ${{ github.ref }} # The branch where you commit
+          base: main
