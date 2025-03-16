@@ -1,11 +1,11 @@
 [versions]
-kotlin = "1.9.0"
-ksp = "1.9.0-1.0.13"
+kotlin = "2.1.10"
+ksp = "2.1.10-1.0.31"
 android-gradle = "8.0.2"
 detekt = "1.23.8"
 kotlinpoet = "1.14.2"
 junit = "5.9.2"
-kotlin-compile-testing = "1.5.0"
+kotlin-compile-testing = "0.7.0"
 
 jdk = "17"
 android-jdk = "1.8"
@@ -19,13 +19,18 @@ kotlin-stdlib-common = { module = "org.jetbrains.kotlin:kotlin-stdlib-common", v
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+
+ksp-cli = { module = "com.google.devtools.ksp:symbol-processing-cmdline", version.ref = "ksp" }
+ksp-aa-embeddable = { module = "com.google.devtools.ksp:symbol-processing-aa-embeddable", version.ref = "ksp" }
+ksp-commonDeps = { module = "com.google.devtools.ksp:symbol-processing-common-deps", version.ref = "ksp" }
+
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
 
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-kotlin-compile-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlin-compile-testing" }
-kotlin-compile-testing-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlin-compile-testing" }
+kotlin-compile-testing = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlin-compile-testing" }
+kotlin-compile-testing-ksp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlin-compile-testing" }
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

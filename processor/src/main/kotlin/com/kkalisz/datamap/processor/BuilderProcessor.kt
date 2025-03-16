@@ -201,24 +201,6 @@ class BuilderProcessor(
     }
 
     /**
-     * Generates code for handling a property with default value.
-     */
-    private fun generateDefaultValuePropertyCode(
-        codeBlock: CodeBlock.Builder,
-        propName: String,
-        typeName: TypeName,
-        isBoolean: Boolean
-    ) {
-        val defaultValue = if (isBoolean) " ?: true" else ""
-        codeBlock.add(
-            "%L = $VALUES_PROPERTY.getNotRequiredValueOrThrow<%T>(%S)$defaultValue",
-            propName,
-            typeName,
-            propName
-        )
-    }
-
-    /**
      * Generates the build function that creates an instance of the target class from the collected values.
      * Handles different property types (nullable, required, with defaults) appropriately.
      */
@@ -235,16 +217,11 @@ class BuilderProcessor(
         properties.forEachIndexed { index, prop ->
             val propName = prop.simpleName.asString()
             val propType = prop.type.resolve()
-            val typeName = propType.toClassName()
-            val hasDefaultValue = classDecl.primaryConstructor
-                ?.parameters
-                ?.find { it.name?.asString() == propName }
-                ?.hasDefault ?: false
+            val typeName = propType.toTypeNameWithGenerics()
 
             when {
                 propType.isMarkedNullable -> generateNullablePropertyCode(codeBlock, propName, typeName)
-                !hasDefaultValue -> generateRequiredPropertyCode(codeBlock, propName, typeName)
-                else -> generateDefaultValuePropertyCode(codeBlock, propName, typeName, typeName == Boolean::class.asClassName())
+                else -> generateRequiredPropertyCode(codeBlock, propName, typeName)
             }
 
             codeBlock.add(if (index < properties.size - 1) ",\n" else "\n")
@@ -297,7 +274,7 @@ class BuilderProcessor(
         val builderProviderType = BUILDER_PROVIDER_TYPE.parameterizedBy(className)
 
         return FunSpec.builder(BUILD_INSTANCE_FUNCTION)
-            .receiver(builderProviderType)
+            .receiver(className)
             .addParameter(
                 ParameterSpec.builder(
                     "initialize",
@@ -310,7 +287,7 @@ class BuilderProcessor(
             .returns(className)
             .addCode(
                 CodeBlock.builder()
-                    .addStatement("return mapBuilder().apply(initialize).build()")
+                    .addStatement("return toMapBuilder().apply(initialize).build()")
                     .build()
             )
             .build()

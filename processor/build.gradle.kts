@@ -9,6 +9,11 @@ dependencies {
     implementation(project(":runtime"))
 
     implementation(libs.ksp.api)
+
+    implementation(libs.ksp.aa.embeddable)
+    testImplementation(libs.ksp.commonDeps)
+    testImplementation(libs.ksp.cli)
+
     implementation(libs.kotlinpoet)
     implementation(libs.kotlinpoet.ksp)
 

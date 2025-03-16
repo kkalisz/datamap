@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalCompilerApi::class)
+
 package com.kkalisz.datamap.processor
 
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.symbolProcessorProviders
+import com.tschuchort.compiletesting.configureKsp
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -27,9 +30,13 @@ class BuilderProcessorTest {
 
         val compilation = KotlinCompilation().apply {
             sources = listOf(source)
-            symbolProcessorProviders = listOf(BuilderProcessorProvider())
             inheritClassPath = true
             messageOutputStream = System.out
+            configureKsp(useKsp2 = true){
+                useKapt4 = true
+                jvmTarget = "21"
+                symbolProcessorProviders.add(BuilderProcessorProvider())
+            }
         }
 
         val result = compilation.compile()
@@ -54,9 +61,13 @@ class BuilderProcessorTest {
 
         val compilation = KotlinCompilation().apply {
             sources = listOf(source)
-            symbolProcessorProviders = listOf(BuilderProcessorProvider())
             inheritClassPath = true
             messageOutputStream = System.out
+            configureKsp(useKsp2 = true){
+                useKapt4 = true
+                jvmTarget = "21"
+                symbolProcessorProviders.add(BuilderProcessorProvider())
+            }
         }
 
         val result = compilation.compile()
@@ -84,9 +95,13 @@ class BuilderProcessorTest {
 
         val compilation = KotlinCompilation().apply {
             sources = listOf(source)
-            symbolProcessorProviders = listOf(BuilderProcessorProvider())
             inheritClassPath = true
             messageOutputStream = System.out
+            configureKsp(useKsp2 = true){
+                useKapt4 = true
+                jvmTarget = "21"
+                symbolProcessorProviders.add(BuilderProcessorProvider())
+            }
         }
 
         val result = compilation.compile()
@@ -96,8 +111,9 @@ class BuilderProcessorTest {
         assertNotNull(generatedFile, "Builder file was not generated")
 
         val generatedCode = generatedFile.readText()
+
         assertTrue(
-            generatedCode.contains("override fun contains(key: String): Boolean = values.containsKey(key)\n"),
+            generatedCode.contains("override fun contains(name: String): Boolean = values.containsKey(name)\n"),
             "contains method was not generated"
         )
     }
@@ -120,7 +136,7 @@ class BuilderProcessorTest {
 
             fun main() {
                 val user = User("John", 25, "john@example.com")
-                val user2 = (user as BuilderProvider<User>).buildInstance {
+                val user2 = user.buildInstance {
                     put("name", "Jane")
                     put("age", 30)
                     put("email", null)
@@ -132,9 +148,13 @@ class BuilderProcessorTest {
 
         val compilation = KotlinCompilation().apply {
             sources = listOf(source)
-            symbolProcessorProviders = listOf(BuilderProcessorProvider())
             inheritClassPath = true
             messageOutputStream = System.out
+            configureKsp(useKsp2 = true){
+                useKapt4 = true
+                jvmTarget = "21"
+                symbolProcessorProviders.add(BuilderProcessorProvider())
+            }
         }
 
         val result = compilation.compile()
@@ -167,7 +187,7 @@ class BuilderProcessorTest {
             fun main() {
                 val user = User("John", 25)
                 try {
-                    val user2 = (user as BuilderProvider<User>).buildInstance {
+                    val user2 = user.buildInstance {
                         put("name", 42) // Wrong type: Int instead of String
                     }
                     throw AssertionError("Should have thrown ClassCastException")
@@ -176,7 +196,7 @@ class BuilderProcessorTest {
                 }
 
                 try {
-                    val user3 = (user as BuilderProvider<User>).buildInstance {
+                    val user3 = user.buildInstance {
                         put("age", "30") // Wrong type: String instead of Int
                     }
                     throw AssertionError("Should have thrown ClassCastException")
@@ -189,9 +209,13 @@ class BuilderProcessorTest {
 
         val compilation = KotlinCompilation().apply {
             sources = listOf(source)
-            symbolProcessorProviders = listOf(BuilderProcessorProvider())
             inheritClassPath = true
             messageOutputStream = System.out
+            configureKsp(useKsp2 = true){
+                useKapt4 = true
+                jvmTarget = "21"
+                symbolProcessorProviders.add(BuilderProcessorProvider())
+            }
         }
 
         val result = compilation.compile()
@@ -208,13 +232,15 @@ class BuilderProcessorTest {
 
     @Test
     fun `test complex data class with multiple properties`() {
-
-
         val compilation = KotlinCompilation().apply {
             sources = listOf(complexUserSource)
-            symbolProcessorProviders = listOf(BuilderProcessorProvider())
             inheritClassPath = true
             messageOutputStream = System.out
+            configureKsp(useKsp2 = true){
+                useKapt4 = true
+                jvmTarget = "21"
+                symbolProcessorProviders.add(BuilderProcessorProvider())
+            }
         }
 
         val result = compilation.compile()

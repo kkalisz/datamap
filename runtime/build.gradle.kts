@@ -26,6 +26,11 @@ kotlin {
         nodejs()
     }
 
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs {
+//        browser()
+//        binaries.executable()
+//    }
     listOf(
         iosX64(),
         iosArm64(),

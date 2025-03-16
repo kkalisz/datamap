@@ -36,7 +36,7 @@ val complexUserSource = SourceFile.kotlin(
                     scores = mapOf("math" to 90, "science" to 85)
                 )
 
-                val user2 = (user as BuilderProvider<ComplexUser>).copyBuild {
+                val user2 = user.buildInstance {
                     put("name", "Jane")
                     put("age", 30)
                     put("email", null)
