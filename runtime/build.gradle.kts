@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.vanniktech.mavenPublish)
 }
 
 kotlin {
@@ -72,15 +73,29 @@ kotlin {
 }
 
 android {
-    compileSdk = libs.versions.android.compile.sdk.get().toInt()
+    compileSdk =
+        libs.versions.android.compile.sdk
+            .get()
+            .toInt()
     namespace = group.toString()
 
     defaultConfig {
-        minSdk = libs.versions.android.min.sdk.get().toInt()
+        minSdk =
+            libs.versions.android.min.sdk
+                .get()
+                .toInt()
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.android.jdk.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.android.jdk.get())
+        sourceCompatibility =
+            JavaVersion.toVersion(
+                libs.versions.android.jdk
+                    .get(),
+            )
+        targetCompatibility =
+            JavaVersion.toVersion(
+                libs.versions.android.jdk
+                    .get(),
+            )
     }
 }

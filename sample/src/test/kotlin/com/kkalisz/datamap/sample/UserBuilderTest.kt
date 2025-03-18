@@ -28,10 +28,13 @@ class UserBuilderTest {
     @Test
     fun `test modify existing instance`() {
         val user = User(1L, "John Doe", "john@example.com", 30)
-        val newUser = user.toMapBuilder().apply {
-            put("name", "Jane Doe")
-            put("email", null)
-        }.build()
+        val newUser =
+            user
+                .toMapBuilder()
+                .apply {
+                    put("name", "Jane Doe")
+                    put("email", null)
+                }.build()
 
         assertEquals(1L, newUser.id)
         assertEquals("Jane Doe", newUser.name)
@@ -70,9 +73,10 @@ class UserBuilderTest {
         val builder = user.toMapBuilder()
         assertTrue(builder is MapDataBuilder<*>)
 
-        val newUser = user.buildInstance {
-            put("name", "Jane Doe")
-        }
+        val newUser =
+            user.buildInstance {
+                put("name", "Jane Doe")
+            }
 
         assertEquals("Jane Doe", newUser.name)
     }
