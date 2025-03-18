@@ -11,15 +11,17 @@ kotlin {
 
     androidTarget {
         compilations.all {
-            kotlinOptions {
-                jvmTarget = libs.versions.android.jdk.get()
+            compileTaskProvider.configure {
+                compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.android.jdk.get()))
             }
         }
     }
 
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = libs.versions.jdk.get()
+            compileTaskProvider.configure {
+                compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.jdk.get()))
+            }
         }
     }
 
@@ -48,8 +50,8 @@ kotlin {
             isStatic = true
         }
         target.compilations.configureEach {
-            compilerOptions.configure {
-                freeCompilerArgs.add("-Xbinary=bundleId=com.kkalisz.datamap.runtime")
+            compileTaskProvider.configure {
+                compilerOptions.freeCompilerArgs.add("-Xbinary=bundleId=com.kkalisz.datamap.runtime")
             }
         }
     }
