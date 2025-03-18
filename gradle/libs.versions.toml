@@ -7,7 +7,7 @@ kotlinpoet = "1.14.2"
 junit = "5.9.2"
 kotlin-compile-testing = "0.7.0"
 
-jdk = "17"
+jdk = "21"
 android-jdk = "1.8"
 android-compile-sdk = "34"
 android-min-sdk = "21"
@@ -39,3 +39,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-library = { id = "com.android.library", version.ref = "android-gradle" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.30.0" }
